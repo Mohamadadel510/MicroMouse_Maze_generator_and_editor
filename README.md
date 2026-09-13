@@ -25,23 +25,30 @@ python micromouse_maze_designer.py
 
 ## Designing a maze
 
-- **Size dropdown** — 4×4 (test), 8×8, or 16×16 (standard competition size).
-- **Click a cell edge** on the canvas to toggle a wall on or off by hand.
+- **Size dropdown** — 4×4 (test), 8×8, 16×16, or 32×32.
+- **Click mode dropdown** — switches what a canvas click does:
+  - **Walls** (default) — click a cell edge to toggle a wall on or off.
+  - **Set Start** — click any cell to make it the start (green). Can't
+    overlap the goal.
+  - **Set Goal** — click a cell to add or remove it from the goal room
+    (coral). The goal can be any shape and any size, but its cells must
+    stay a single connected block — **Generate maze** will refuse and
+    tell you if they aren't.
 - **Generate maze** — builds a random, guaranteed-solvable maze with a
-  recursive-backtracker algorithm. Every cell is reachable from the start.
+  recursive-backtracker algorithm, using whatever start/goal you've set.
+  Every cell is reachable from the start.
 - **Clear walls** — removes all internal walls, keeping just the outer
   border.
 - **Reset border** — restores the outer border without touching interior
   walls.
 
-Start and goal are fixed by convention:
-
-- **Start** (green) is always the bottom-left corner.
-- **Goal** (coral) is the cell at the center — a 2×2 block of four cells
-  for even sizes (4×4, 8×8, 16×16), or a single cell for odd sizes. The
-  goal is always sealed as one open chamber (no internal walls between the
-  goal cells) with **exactly one entrance** from the rest of the maze —
-  matching official micromouse maze rules.
+Start and goal default to the classic layout (bottom-left corner start,
+center goal — a 2×2 block for even sizes, a single cell for odd sizes)
+whenever you pick a new size, but you're free to move either one anywhere
+on the grid using the click modes above. Whatever shape the goal ends up
+as, it's always sealed as one open chamber (no internal walls between its
+cells) with **exactly one entrance** from the rest of the maze — matching
+official micromouse maze rules.
 
 ## Saving and loading mazes
 
@@ -77,9 +84,11 @@ reloading a maze reproduces the identical wall layout.
 Writes the maze in the "num" format documented in the
 [mms README](https://github.com/mackorone/mms#num-format): one line per
 cell, `X Y N E S W`, where `X`/`Y` use mms's coordinate system (X
-increases right, Y increases **up**, origin at the bottom-left corner —
-which lines up with this app's fixed start corner), and `N`/`E`/`S`/`W`
-are `1` if a wall is present on that side, else `0`.
+increases right, Y increases **up**, origin at the bottom-left corner),
+and `N`/`E`/`S`/`W` are `1` if a wall is present on that side, else `0`.
+This format only describes walls — it has no concept of start/goal
+placement, so wherever you've put yours in this app won't carry over;
+mms determines start/goal from its own maze conventions.
 
 This export was checked line-for-line against the exact example maze in
 the mms README to confirm the coordinate mapping and column order are
@@ -131,3 +140,7 @@ instead.
 - **"Couldn't parse that file" on Load** — only files saved by this app's
   own **Save as .txt** exporter are guaranteed to load back in; hand-edited
   or third-party maze files may not match the expected format.
+- **"Can't generate maze: Goal cells must form a single connected block"**
+  — switch to **Set Goal** mode and check your goal cells are all
+  touching (sharing an edge, not just a corner). Diagonal-only adjacency
+  doesn't count as connected.
